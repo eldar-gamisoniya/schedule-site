@@ -3,6 +3,8 @@
     {{ msg }}
     {{ count }}
     <button v-on:click="increment">Add 1</button>
+    
+    <router-link to="/hello">Go to hello</router-link>    
   </div>   
 </template>
 
@@ -27,4 +29,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+  div {
+    background-color: #aaa;
+  }
 </style>

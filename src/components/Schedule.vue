@@ -126,7 +126,14 @@ export default {
   methods: {
     ...mapMutations(['setEditMode', 'pinSchedule']),
     getArrayByDay (day) {
-      return this.schedule.subjects.filter(subject => subject.dayOfWeek === day)
+      return this.schedule.subjects.filter(subject => subject.dayOfWeek === day).sort((s1, s2) => {
+        if (s1.time < s2.time) {
+          return -1
+        } else if (s1.time > s2.time) {
+          return 1
+        }
+        return 0
+      })
     },
     updateSchedule () {
       fetch(`${API_URL}/schedule/find`, {

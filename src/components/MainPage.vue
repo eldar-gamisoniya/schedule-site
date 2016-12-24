@@ -1,6 +1,6 @@
 <template>
   <div>
-    <schedule v-if="pinnedScheduleId !== null" schedule-id="pinnedScheduleId"></schedule>
+    <schedule v-if="pinnedScheduleId !== null" :schedule-id="pinnedScheduleId"></schedule>
     <no-schedule v-else></no-schedule>
   </div>   
 </template>

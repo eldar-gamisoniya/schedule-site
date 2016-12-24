@@ -1,11 +1,10 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-
+import API_URL from '../constants'
 Vue.use(Vuex)
 
 const TOKEN_KEY = 'token'
 const PINNED_SCHEDULE_ID_KEY = 'pinned_schedule_id'
-const API_URL = 'http://localhost:8080'
 
 export default new Vuex.Store({
   state: {

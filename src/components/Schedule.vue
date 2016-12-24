@@ -65,7 +65,7 @@
       </md-dialog-content>
 
       <md-dialog-actions>
-        <md-button class="md-primary" @click="closeDialogAndSave()">Сохранить</md-button>
+        <md-button class="md-primary" v-if="editModeEnabled" @click="closeDialogAndSave()">Сохранить</md-button>
         <md-button class="md-primary" @click="closeDialog()">Отменить</md-button>
       </md-dialog-actions>
     </md-dialog>
@@ -74,6 +74,7 @@
 
 <script>
 import { mapState, mapMutations } from 'vuex'
+import { API_URL } from '../constants'
 import SubjectCard from './SubjectCard'
 // name time dayOfWeek
 export default {
@@ -81,48 +82,26 @@ export default {
     SubjectCard
   },
   created () {
-    this.setEditMode({editModeEnabled: false, editModeAllowed: true})
+    this.updateSchedule()
   },
   beforeDestroy () {
     this.setEditMode({editModeEnabled: false, editModeAllowed: false})
   },
   data () {
-    const schedule = {
-      '_id': '585d5e70ac27e000049e9af',
-      'created': '2016-05-18T16:00:00.000Z',
-      'modified': '2016-05-18T16:00:00.000Z',
-      'active': true,
-      'university': 'БГУ',
-      'country': 'Беларусь',
-      'course': '4',
-      'group': '12',
-      'name': 'Тест',
-      '__v': 0,
-      'subjects': [{
-        '_id': '585d8c55ceccaa00041a093d',
-        'duration': 0,
-        'dayOfWeek': 7,
-        'time': new Date(),
-        'professor': 'Давидовская М.И.',
-        'place': '508',
-        'name': 'ЧМИ',
-        'description': ''
-      }, {
-        '_id': '585d8c55ceccaa00541a093d',
-        'duration': 0,
-        'dayOfWeek': 4,
-        'time': new Date(),
-        'professor': 'Давидовская М.И.',
-        'place': '508',
-        'name': 'ЧМИ',
-        'description': ''
-      }]
-    }
-    this.addRandomIdAndTime(schedule)
     return {
-      schedule,
+      schedule: null,
       days: [1, 2, 3, 4, 5, 6, 7],
       creatingSubject: this.createNewSubject()
+    }
+  },
+  watch: {
+    $route () {
+      this.updateSchedule()
+    },
+    editModeEnabled () {
+      if (this.editModeEnabled === false) {
+        this.saveSchedule()
+      }
     }
   },
   props: {
@@ -134,7 +113,8 @@ export default {
   computed: {
     ...mapState({
       pinnedScheduleId: state => state.pinnedScheduleId,
-      editModeEnabled: state => state.editModeEnabled
+      editModeEnabled: state => state.editModeEnabled,
+      token: state => state.token
     }),
     showPinButton () {
       return this.pinnedScheduleId !== this.scheduleId
@@ -148,10 +128,47 @@ export default {
     getArrayByDay (day) {
       return this.schedule.subjects.filter(subject => subject.dayOfWeek === day)
     },
+    updateSchedule () {
+      fetch(`${API_URL}/schedule/find`, {
+        method: 'POST',
+        body: JSON.stringify({
+          '_id': this.scheduleId
+        }),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      .then(res => res.json())
+      .then(data => {
+        this.setEditMode({editModeEnabled: false, editModeAllowed: true})
+        this.addRandomIdAndTime(data[0])
+        this.schedule = data[0]
+      })
+    },
+    saveSchedule () {
+      this.translateStringsToDate()
+      const body = JSON.stringify(this.schedule)
+      this.addRandomIdAndTime()
+      fetch(`${API_URL}/schedule/${this.scheduleId}`, {
+        method: 'PUT',
+        body: body,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': this.token
+        }
+      })
+    },
     addRandomIdAndTime (data) {
       (data || this.schedule).subjects.forEach(subject => {
-        subject.time = `${subject.time.getHours()}:${subject.time.getMinutes()}`
+        const date = new Date(subject.time)
+        subject.time = `${date.getHours()}:${date.getMinutes()}`
         subject.randomId = `id${subject._id}`
+      })
+    },
+    translateStringsToDate () {
+      this.schedule.subjects.forEach(subject => {
+        const splitted = subject.time.split(':')
+        subject.time = new Date(1, 1, 1, splitted[0], splitted[1]).toISOString()
       })
     },
     onSaveSubject (subject) {

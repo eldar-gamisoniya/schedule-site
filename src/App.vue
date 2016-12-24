@@ -27,4 +27,8 @@ export default {
   #app{
     height: 100%;
   }
+  .md-tab-header{
+    width:14%;
+    min-width:150px
+  }
 </style>

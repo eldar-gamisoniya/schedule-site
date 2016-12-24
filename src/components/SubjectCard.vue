@@ -1,53 +1,89 @@
 <template>
-  <div v-on:click="onClick">
+  <div @click="openDialog()" :id="subject.randomId">
     <md-card class="card card-ripple" >
         <md-ink-ripple></md-ink-ripple>
-        <div class="name">{{name}}</div>
+        <div class="flexbox">
+          <div class="name">{{subject.name}}</div>
+          <md-button v-if="editModeEnabled" @click="onDeleteSubject" class="small-button"><md-icon>close</md-icon></md-button>
+        </div>
         <div class="text">
-          <div>{{professor}}</div>
+          <div>{{subject.professor}}</div>
           <div class="flexbox">
-            <div>{{time.getHours()}}:{{time.getMinutes()}}</div>
-            <div class="padding3">к.518</div>
+            <div>{{subject.time}}</div>
+            <div class="padding3">{{subject.place}}</div>
           </div>
         </div>
     </md-card>
+
+    <md-dialog :md-open-from="'#' + subject.randomId" :md-close-to="'#' + subject.randomId" ref="dialog">
+      <md-dialog-content>
+        <md-input-container>
+          <label>Предмет:</label>
+          <md-input v-model="editingSubject.name" required :disabled="!editModeEnabled" class="text-black"></md-input>
+        </md-input-container>
+        <md-input-container>
+          <label>Время:</label>
+          <md-input v-model="editingSubject.time" required :disabled="!editModeEnabled" class="text-black"></md-input>
+        </md-input-container>
+        <md-input-container>
+          <label>Преподаватель:</label>
+          <md-input v-model="editingSubject.professor" :disabled="!editModeEnabled" class="text-black"></md-input>
+        </md-input-container>
+        <md-input-container>
+          <label>Кабинет:</label>
+          <md-input v-model="editingSubject.place" :disabled="!editModeEnabled" class="text-black"></md-input>
+        </md-input-container>
+        <md-input-container>
+          <label>Описание:</label>
+          <md-input v-model="editingSubject.description" :disabled="!editModeEnabled" class="text-black"></md-input>
+        </md-input-container>
+      </md-dialog-content>
+
+      <md-dialog-actions>
+        <md-button class="md-primary" @click="closeDialogAndSave()">Сохранить</md-button>
+        <md-button class="md-primary" @click="closeDialog()">Отменить</md-button>
+      </md-dialog-actions>
+    </md-dialog>
   </div>
 </template>
 
 <script>
+import { mapState } from 'vuex'
+
 export default {
   props: {
-    name: { type: String, required: true },
-    professor: { type: String, required: false },
-    duration: { type: Number, required: false },
-    time: { type: Date, required: true },
-    dayOfWeek: { type: Number, required: true },
-    place: { type: String, required: false },
-    description: { type: String, required: false }
+    subject: { type: Object, required: true },
+    onSave: { type: Function, required: true },
+    onDelete: { type: Function, required: true }
   },
   data () {
+    const editingSubject = Object.assign({}, this.subject)
     return {
-      editedName: this.name,
-      editedProfessor: this.professor,
-      editedDuration: this.duration,
-      editedTime: this.time,
-      editedDayOfWeek: this.dayOfWeek,
-      editedPlace: this.place,
-      editedDescription: this.description
+      editingSubject: editingSubject
     }
   },
+  computed: {
+    ...mapState({
+      editModeEnabled: state => state.editModeEnabled
+    })
+  },
   methods: {
-    onClick () {
-      console.log('hi')
-    },
     restoreEditedField () {
-      this.editedName = this.name
-      this.editedProfessor = this.professor
-      this.editedDuration = this.duration
-      this.editedTime = this.time
-      this.editedDayOfWeek = this.dayOfWeek
-      this.editedPlace = this.place
-      this.editedDescription = this.description
+      this.editingSubject = Object.assign({}, this.subject)
+    },
+    openDialog () {
+      this.$refs.dialog.open()
+    },
+    closeDialog () {
+      this.$refs.dialog.close()
+    },
+    closeDialogAndSave () {
+      this.$refs.dialog.close()
+      this.onSave(this.editingSubject)
+    },
+    onDeleteSubject (event) {
+      event.stopPropagation()
+      this.onDelete(this.subject.randomId)
     }
   }
 }
@@ -58,8 +94,6 @@ export default {
   .card{
     cursor: pointer;
     padding: 10px;
-    width: 13%;
-    min-width: 100px;
   }
   .card .name{
     font-size: 16px;
@@ -75,5 +109,15 @@ export default {
   }
   .padding3{
     padding-left: 3px;
+  }
+  .text-black{
+    color: black !important;
+  }
+  .small-button{
+    min-width: 10px;
+    min-height: 10px;
+    margin: 0;
+    padding: 0;
+    line-height: 0;
   }
 </style>

@@ -33,8 +33,8 @@ export default new Vuex.Store({
       state.token = token
     },
     pinSchedule (state, scheduleId) {
-      localStorage.setItem(PINNED_SCHEDULE_ID_KEY)
-      state.pinnedSchedule = Object.assign({}, scheduleId)
+      localStorage.setItem(PINNED_SCHEDULE_ID_KEY, scheduleId)
+      state.pinnedScheduleId = scheduleId
     },
     clearToken (state) {
       state.token = null

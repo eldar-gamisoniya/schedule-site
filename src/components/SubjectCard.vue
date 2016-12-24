@@ -41,7 +41,8 @@
 
       <md-dialog-actions>
         <md-button class="md-primary" v-if="editModeEnabled" @click="closeDialogAndSave()">Сохранить</md-button>
-        <md-button class="md-primary" @click="closeDialog()">Отменить</md-button>
+        <md-button class="md-primary" v-if="editModeEnabled" @click="closeDialog()">Отменить</md-button>
+        <md-button class="md-primary" v-else @click="closeDialog()">Закрыть</md-button>
       </md-dialog-actions>
     </md-dialog>
   </div>

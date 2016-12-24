@@ -20,7 +20,7 @@
 
             <md-list-item>
             <div class="md-list-text-container">
-                <span>johndoe@email.com</span>
+                <span>{{displayEmail}}</span>
             </div>
             </md-list-item>
         </md-list>
@@ -99,7 +99,8 @@ export default {
   },
   computed: {
     ...mapState({
-      sidebarToggled: state => state.sidebarToggled
+      sidebarToggled: state => state.sidebarToggled,
+      displayEmail: state => state.email
     }),
     ...mapGetters([
       'isAuthenticated'
@@ -113,21 +114,19 @@ export default {
       this.$router.push('/')
     },
     onRegisterClicked () {
-      this.toggleSidebar()
+      this.$refs.registerDialog.close()
       this.register({ email: this.email, password: this.password })
     },
     openRegisterDialog () {
       this.clearData()
-      this.toggleSidebar()
       this.$refs.registerDialog.open()
     },
     onLoginClicked () {
-      this.toggleSidebar()
+      this.$refs.authenticateDialog.close()
       this.authenticate({ email: this.email, password: this.password })
     },
     openLoginDialog () {
       this.clearData()
-      this.toggleSidebar()
       this.$refs.authenticateDialog.open()
     },
     onLogoutClicked () {

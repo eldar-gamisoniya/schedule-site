@@ -1,23 +1,30 @@
 <template>
   <div id="app">
-    <img src="./assets/logo.png">
-    <router-view></router-view>
+    <toolbar></toolbar>
+    <sidebar></sidebar>
+    <transition>
+      <router-view></router-view>
+    </transition>
   </div>
 </template>
 
 <script>
+import Toolbar from 'components/Toolbar'
+import Sidebar from 'components/Sidebar'
 export default {
-  name: 'app'
+  name: 'app',
+  components: {
+    Toolbar,
+    Sidebar
+  }
 }
 </script>
 
 <style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+  body{
+    min-height: 100%;  
+  }
+  #app{
+    height: 100%;
+  }
 </style>

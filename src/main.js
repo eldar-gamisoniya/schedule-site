@@ -7,12 +7,13 @@ import router from './router'
 
 import { sync } from 'vuex-router-sync'
 sync(store, router)
-
 Vue.use(VueMaterial)
 
-Vue.material.theme.register('default', {
-  primary: 'cyan',
-  accent: 'pink'
+Vue.material.registerTheme('default', {
+  primary: 'red',
+  accent: 'grey',
+  warn: 'red',
+  background: 'grey'
 })
 
 /* eslint-disable no-new */

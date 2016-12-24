@@ -5,6 +5,7 @@ Vue.use(Vuex)
 
 const TOKEN_KEY = 'token'
 const PINNED_SCHEDULE_ID_KEY = 'pinned_schedule_id'
+const API_URL = 'http://localhost:8080'
 
 export default new Vuex.Store({
   state: {
@@ -14,7 +15,8 @@ export default new Vuex.Store({
     pinnedScheduleId: localStorage.getItem(PINNED_SCHEDULE_ID_KEY),
     searchString: '',
     editModeEnabled: false,
-    editModeAllowed: false
+    editModeAllowed: false,
+    isLoading: false
   },
   getters: {
     isAuthenticated: state => {
@@ -45,6 +47,49 @@ export default new Vuex.Store({
     setEditMode (state, { editModeEnabled, editModeAllowed }) {
       state.editModeEnabled = editModeEnabled
       state.editModeAllowed = editModeAllowed
+    },
+    setLoading (state, isLoading) {
+      state.isLoading = isLoading
+    }
+  },
+  actions: {
+    register ({commit, dispatch}, data) {
+      commit('setLoading', true)
+      fetch(`${API_URL}/account/signup`, {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      .then(res => res.json())
+      .then(data => {
+        commit('setLoading', false)
+        if (data.success) {
+          dispatch('authenticate', data)
+        } else {
+          alert('Такой пользователь уже существует')
+        }
+      })
+    },
+    authenticate ({commit}, data) {
+      commit('setLoading', true)
+      fetch(`${API_URL}/account/authenticate`, {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+    .then(res => res.json())
+      .then(data => {
+        commit('setLoading', false)
+        if (data.success) {
+          commit('saveToken', data.token)
+        } else {
+          alert('Пароль набран неверно')
+        }
+      })
     }
   }
 })

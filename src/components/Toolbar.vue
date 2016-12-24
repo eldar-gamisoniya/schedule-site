@@ -16,7 +16,7 @@
                 </md-button>
                 </form>
             </md-layout>
-            <md-layout v-if="editModeAllowed" md-flex-offset="10">
+            <md-layout v-if="isAuthenticated && editModeAllowed" md-flex-offset="10">
               <md-button v-if="editModeEnabled" @click="saveEditedData">Сохранить изменения</md-button>
               <md-button v-else @click="enableEditMode">Включить редактирование</md-button>
             </md-layout>
@@ -26,7 +26,7 @@
 </template>%
 
 <script>
-import { mapState, mapMutations } from 'vuex'
+import { mapState, mapMutations, mapGetters } from 'vuex'
 
 export default {
   name: 'toolbar',
@@ -34,7 +34,10 @@ export default {
     ...mapState({
       editModeEnabled: state => state.editModeEnabled,
       editModeAllowed: state => state.editModeAllowed
-    }),
+    },
+    ...mapGetters([
+      'isAuthenticated'
+    ])),
     message: {
       get () {
         return this.$store.state.searchString
